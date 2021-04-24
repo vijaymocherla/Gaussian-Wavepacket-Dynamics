@@ -1,30 +1,47 @@
+#!/usr/bin/env python
+#
+# Gaussian wavepacket dynamics. This code contains a basic implementation of 
+# gaussian wave packet dynamics  We make use of the Split-Operator(SO) method 
+# for propagating a wave packet hoping between two electronic surfaces.
+# 
+#
+#   
+# Copyright 2020 Sai Vijay Bhaskar Mocherla
+# Open source under the MIT license.
+# Source code at 
+# <https://github.com/vijaymocherla/Gaussian-Wavepacket-Dynamics/>
+
+# The following line provides consistency between python2 and python3.
+from __future__ import print_function, division  # requires Python >= 2.6
+
+# importing the paraphernalia!
 import numpy as np
 import scipy as sp
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import time as timer
 
+# A few more specific imports
 from numpy import fft
 from scipy import linalg, integrate, interpolate
 from matplotlib.animation import FuncAnimation
 
-
+# Plot and typeface options for matplotlib
 mpl.rc('font', size=14)
 mpl.rc('text', usetex=True)
 mpl.rc('font', family='sans-serif', serif='Times New Roman')
 
+
 class Multi_Surface_SO(object):
-    
     def __init__(self,grid_params):
         self.grid_params = grid_params
         self.hbar = 0.6582  # hbar in eV
-        self.L0 = 0.19      # default diabatic coupling lambda0 in eV
-        x_bc,p_bc = self.grid_params
+        self.L0 = 0.1   # default diabatic coupling lambda0 in eV
+        x_bc,p_bc = self.grid_params    # position(x) and momentum(p) boundary conditions
         self.N = 2*p_bc + 1
         self.dx = 2*x_bc/self.N
-        self.X = np.linspace(-x_bc,x_bc,self.N)
-        
-        self.P = (np.pi/x_bc)*np.arange(-p_bc,p_bc+1)
+        self.X = np.linspace(-x_bc,x_bc,self.N) # position(x) grid
+        self.P = (np.pi/x_bc)*np.arange(-p_bc,p_bc+1) # momentum(p) grid
         self.time = 0.0
         
     def psi_x(self,inital_positions,initial_conditions):
